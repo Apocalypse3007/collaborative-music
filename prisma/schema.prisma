@@ -6,10 +6,40 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../app/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String  @unique
+  password  String
+  provider  Provider
+  streams   Stream[]
+}
+
+model Stream{
+  id       String   @id @default(uuid())
+  type     StreamType
+  active   Boolean
+  upvotes  Int
+  userId   String
+  user     User    @relation(fields: [userId], references: [id])
+}
+
+enum StreamType {
+  Audio
+  Video
+}
+
+enum Role {
+  Admin
+  User
+}
+enum Provider {
+  Google
 }
