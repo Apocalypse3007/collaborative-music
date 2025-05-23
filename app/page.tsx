@@ -1,7 +1,9 @@
+import AppBar from "./components/appbar";
+
 export default function Home() {
   return (
     <div>
-      hi there
+      <AppBar />
     </div>
   );
 }
