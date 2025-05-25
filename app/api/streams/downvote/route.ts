@@ -17,18 +17,14 @@ export async function POST(req: NextRequest) {
                 error: data.error 
             }, { status: 400 });
         }
-
         const user = await prisma.user.findUnique({
             where: { id: data.data.userId }
         });
-
         if (!user) {
             return NextResponse.json({ 
                 message: "User not found" 
             }, { status: 403 });
         }
-
-        // Delete upvote
         await prisma.upvote.delete({
             where: {
                 userId_streamId: {
@@ -37,13 +33,11 @@ export async function POST(req: NextRequest) {
                 }
             }
         });
-
         return NextResponse.json({ 
             message: "Downvoted successfully" 
         }, { status: 200 });
 
     } catch (error: any) {
-        // Handle case where upvote doesn't exist
         if (error?.code === 'P2025') {
             return NextResponse.json({ 
                 message: "No upvote found to remove" 
