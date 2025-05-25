@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { createHash } from "crypto";
+import { createHash,  } from "crypto";
 const handler = NextAuth({
   providers: [
   GoogleProvider({
@@ -18,11 +18,48 @@ const handler = NextAuth({
       password: { label: "Password", type: "password" }
     },
     async authorize(credentials, req) {
-      const user = { id: "1", name: "J Smith", email: "jsmith@example.com" }
-      if (user) {
-        return user
-      } else {
-        return null
+      try {
+
+        if (!credentials?.email || !credentials?.password || !credentials?.name) {
+          throw new Error('All fields are required');
+        }
+
+        const hashPassword = (password: string) => {
+          return createHash("sha256").update(password).digest("hex");
+        };
+        const hashedPassword = hashPassword(credentials.password);
+        const user = await prisma.user.upsert({
+          where: { email: credentials.email },
+          update: {
+            password: hashedPassword,
+            provider: "Credentials",
+            name: credentials.name,
+            role: "User"
+          },
+          create: {
+            email: credentials.email,
+            password: hashedPassword,
+            name: credentials.name,
+            provider: "Credentials",
+            role: "User"
+          }
+        });
+
+        // Verify password
+        if (user.password !== hashedPassword) {
+          throw new Error('Invalid credentials');
+        }
+
+        // Return user object without sensitive data
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role
+        };
+      } catch (error) {
+        console.error('Authentication error:', error);
+        throw error;
       }
     }
   })

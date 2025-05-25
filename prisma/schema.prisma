@@ -56,4 +56,5 @@ enum Role {
 }
 enum Provider {
   Google
+  Credentials
 }
