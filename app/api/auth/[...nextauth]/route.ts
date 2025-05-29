@@ -17,13 +17,11 @@ const handler = NextAuth({
       email: { label: "Email", type: "email" },
       password: { label: "Password", type: "password" }
     },
-    async authorize(credentials, req) {
+    async authorize(credentials) {
       try {
-
         if (!credentials?.email || !credentials?.password || !credentials?.name) {
           throw new Error('All fields are required');
         }
-
         const hashPassword = (password: string) => {
           return createHash("sha256").update(password).digest("hex");
         };
@@ -44,13 +42,9 @@ const handler = NextAuth({
             role: "User"
           }
         });
-
-        // Verify password
         if (user.password !== hashedPassword) {
           throw new Error('Invalid credentials');
         }
-
-        // Return user object without sensitive data
         return {
           id: user.id,
           name: user.name,
@@ -94,7 +88,5 @@ callbacks: {
     return true;
   }
 }
-}
-)
-
+})
 export { handler as GET, handler as POST }

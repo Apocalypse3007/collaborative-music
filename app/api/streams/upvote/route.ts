@@ -40,18 +40,12 @@ export async function POST(req: NextRequest) {
             upvote 
         }, { status: 201 });
 
-    } catch (error: any) {
-        // Handle unique constraint violation (user trying to upvote same stream twice)
-        if (error?.code === 'P2002') {
-            return NextResponse.json({ 
-                message: "Already upvoted this stream" 
-            }, { status: 400 });
-        }
-
-        console.error('Error creating upvote:', error);
+    } catch (error) {
+        console.error("Error in upvote route:", error);
         return NextResponse.json({ 
-            message: "Error creating upvote",
+            message: "Internal server error",
             error: error instanceof Error ? error.message : "Unknown error"
         }, { status: 500 });
     }
+       
 }

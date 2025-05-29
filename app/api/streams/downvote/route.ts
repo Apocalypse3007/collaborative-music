@@ -37,16 +37,10 @@ export async function POST(req: NextRequest) {
             message: "Downvoted successfully" 
         }, { status: 200 });
 
-    } catch (error: any) {
-        if (error?.code === 'P2025') {
-            return NextResponse.json({ 
-                message: "No upvote found to remove" 
-            }, { status: 404 });
-        }
-
-        console.error('Error removing upvote:', error);
+    } catch (error) {
+        console.error("Error in upvote route:", error);
         return NextResponse.json({ 
-            message: "Error removing upvote",
+            message: "Internal server error",
             error: error instanceof Error ? error.message : "Unknown error"
         }, { status: 500 });
     }
